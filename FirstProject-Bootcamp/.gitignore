@@ -23,7 +23,7 @@ npm-debug.log*
 # Packaged SuiteCloud projects
 build
 
-# misc
+# misc2
 .sass-cache
 
 # Optional npm cache directory
@@ -32,7 +32,7 @@ build
 # System Files
 .DS_Store
 Thumbs.db
-
+p
 # Output of 'npm pack'
 *.tgz
 
