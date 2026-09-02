@@ -3,7 +3,7 @@
  * @NScriptType ClientScript
  * @NModuleScope SameAccount
  */
-define([], function () {
+define(["N/ui/dialog", "N/runtime"], function (dialog, modulo_runtime) {
   /**
    * Function to be executed after page is initialized.
    *
@@ -13,7 +13,20 @@ define([], function () {
    *
    * @since 2015.2
    */
-  const pageInit = (scriptContext) => {};
+  const pageInit = (scriptContext) => {
+    const options = {
+      title: "Hola ",
+      message: "Tu correo es: ",
+    };
+    try {
+      options.title += modulo_runtime.getCurrentUser().name;
+      options.message += modulo_runtime.getCurrentUser().email;
+      dialog.alert(options);
+      log.debug("Success", "Alert displayed successfully");
+    } catch (e) {
+      log.error(e.name, e.message);
+    }
+  };
 
   /**
    * Function to be executed when field is changed.
@@ -43,16 +56,22 @@ define([], function () {
       if (sublistName === "item" && sublistFieldName === "item") {
         // Si el nombre de la sublista es "item" y el nombre del campo de la sublista es "item", entonces se ejecuta el siguiente bloque de código.
         debugger;
+        const item = currentRecord.getCurrentSublistValue({
+          sublistId: "item",
+          fieldId: "item",
+        });
+        const quantity = currentRecord.getCurrentSublistValue({
+          sublistId: "item",
+          fieldId: "quantity",
+        });
+        log.debug(
+          `valores line`,
+          ` item: ${item} quantity: ${quantity} line: ${line}`,
+        );
         // Primera condicional: Le da los siguientes valores a los campos de la sublista "item" en la linea actual.
         currentRecord.setValue({
           fieldId: "memo",
-          value:
-            `Item: ` +
-            currentRecord.getCurrentSublistValue({
-              sublistId: "item",
-              fieldId: "item",
-            }) +
-            `is selected`,
+          value: `Item: ${item} is selected`,
         });
       }
     } catch (error) {
@@ -161,6 +180,7 @@ define([], function () {
   function saveRecord(scriptContext) {}
 
   return {
-    fieldChanged: fieldChanged,
+    fieldChanged,
+    pageInit,
   };
 });
