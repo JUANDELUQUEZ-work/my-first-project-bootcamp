@@ -1,0 +1,98 @@
+name: NetSuite Incremental Auto-Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  deploy:
+    name: Deploy to NetSuite
+    runs-on: ubuntu-latest
+    
+    env:
+      SUITECLOUD_CI: 1
+      SUITECLOUD_CI_PASSKEY: ${{ secrets.MY_CI_PASSKEY }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install SuiteCloud CLI
+        run: npm install -g @oracle/suitecloud-cli --acceptSuiteCloudSDKLicense
+
+      - name: Generate Delta deploy.xml
+        run: |
+          echo "Identificando archivos modificados..."
+          FILES=$(git diff --name-only HEAD~1 HEAD)
+          
+          FILE_PATHS=""
+          OBJ_PATHS=""
+          
+          # 1. Recolectar rutas primero
+          for file in $FILES; do
+            if [[ $file == src/FileCabinet/* ]]; then
+              NS_PATH=${file#src/}
+              FILE_PATHS="${FILE_PATHS}    <path>~/$NS_PATH</path>\n"
+            elif [[ $file == src/Objects/* ]]; then
+              NS_PATH=${file#src/}
+              OBJ_PATHS="${OBJ_PATHS}    <path>~/$NS_PATH</path>\n"
+            fi
+          done
+          
+          mkdir -p src
+          DEPLOY_XML="src/deploy.xml"
+          
+          # 2. Construir el XML dinámicamente
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > $DEPLOY_XML
+          echo '<deploy>' >> $DEPLOY_XML
+          
+          if [[ -n "$FILE_PATHS" ]]; then
+            echo '  <files>' >> $DEPLOY_XML
+            printf "%b" "$FILE_PATHS" >> $DEPLOY_XML
+            echo '  </files>' >> $DEPLOY_XML
+          fi
+          
+          if [[ -n "$OBJ_PATHS" ]]; then
+            echo '  <objects>' >> $DEPLOY_XML
+            printf "%b" "$OBJ_PATHS" >> $DEPLOY_XML
+            echo '  </objects>' >> $DEPLOY_XML
+          fi
+          
+          echo '</deploy>' >> $DEPLOY_XML
+          
+          echo "--- DEPLOY.XML GENERADO ---"
+          cat $DEPLOY_XML
+          
+          # 3. Validar si hay algo para desplegar
+          if [[ -z "$FILE_PATHS" && -z "$OBJ_PATHS" ]]; then
+            echo "⚠️ No hay archivos ni objetos modificados para NetSuite."
+            echo "skip_deploy=true" >> $GITHUB_ENV
+          else
+            echo "skip_deploy=false" >> $GITHUB_ENV
+          fi
+
+      - name: Authenticate with NetSuite (M2M)
+        if: env.skip_deploy == 'false'
+        run: |
+          echo "${{ secrets.NS_PRIVATE_KEY }}" > auth_key.pem
+          chmod 600 auth_key.pem
+          
+          suitecloud account:setup:ci \
+            --account "${{ secrets.NS_ACCOUNT_ID }}" \
+            --authid "GITHUB_CI_DEPLOY" \
+            --certificateid "${{ secrets.NS_CERT_ID }}" \
+            --privatekeypath "./auth_key.pem"
+
+      - name: Validate and Deploy
+        if: env.skip_deploy == 'false'
+        run: |
+          suitecloud project:deploy
