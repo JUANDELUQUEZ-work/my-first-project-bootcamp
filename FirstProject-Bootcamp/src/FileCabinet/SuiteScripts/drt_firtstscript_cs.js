@@ -161,6 +161,6 @@ define([], function () {
   function saveRecord(scriptContext) {}
 
   return {
-    fieldChanged: fieldChanged,
+    fieldChanged,
   };
 });
