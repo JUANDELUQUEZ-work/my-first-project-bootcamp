@@ -1,11 +1,9 @@
 /**
- * @NApiVersion 2.x
+ * @NApiVersion 2.1
  * @NScriptType ClientScript
  * @NModuleScope SameAccount
  */
-define(["N/crypto"] /**
- * @param{crypto} crypto
- */, function (crypto) {
+define([], function () {
   /**
    * Function to be executed after page is initialized.
    *
@@ -38,7 +36,7 @@ define(["N/crypto"] /**
    * @param {Record} scriptContext.currentRecord - Current form record
    * @param {string} scriptContext.sublistId - Sublist name
    * @param {string} scriptContext.fieldId - Field name
-   *_
+   *
    * @since 2015.2
    */
   function postSourcing(scriptContext) {}
