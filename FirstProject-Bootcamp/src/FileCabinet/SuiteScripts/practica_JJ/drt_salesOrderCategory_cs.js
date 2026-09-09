@@ -148,6 +148,6 @@ define(["N/runtime", "N/ui/dialog"] /**
   function saveRecord(scriptContext) {}
 
   return {
-    fieldChanged: fieldChanged,
+    fieldChanged,
   };
 });
