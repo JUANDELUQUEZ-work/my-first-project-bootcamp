@@ -1,4 +1,4 @@
 <manifest projecttype="ACCOUNTCUSTOMIZATION">
-    <projectname>FirstProject-Bootcamp</projectname>
+    <projectname><my-first-project-bootcamp></my-first-project-bootcamp></projectname>
     <frameworkversion>1.0</frameworkversion>
 </manifest>
