@@ -7,7 +7,7 @@ Esta carpeta reúne las prácticas de NetSuite organizadas por tipo de script. L
 ### Client Scripts
 
 - [Documentación: validación de categoría de cliente](./client-scripts/documentation.md)
-- [Código: `drt_salesOrderCategory_cs.js`](./drt_salesOrderCategory_cs.js)
+- [Código: `drt_salesOrderCategory_cs.js`](./client-scripts/drt_salesOrderCategory_cs.js)
 
 En esta categoría se documentan los módulos utilizados por cada script junto con sus eventos. Por ejemplo, `drt_salesOrderCategory_cs.js` usa `N/runtime` y `N/ui/dialog` dentro del mismo Client Script.
 
@@ -15,7 +15,6 @@ En esta categoría se documentan los módulos utilizados por cada script junto c
 
 Cuando se agreguen nuevas prácticas, pueden crearse secciones y carpetas documentales equivalentes:
 
-- `user-events/` para User Event Scripts.
 - `scheduled/` para Scheduled Scripts.
 - `map-reduce/` para Map/Reduce Scripts.
 - `suitelets/` para Suitelets.
