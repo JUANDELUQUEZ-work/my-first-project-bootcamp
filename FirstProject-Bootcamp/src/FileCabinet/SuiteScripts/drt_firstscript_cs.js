@@ -10,7 +10,6 @@ define(["N/ui/dialog", "N/runtime"], function (dialog, modulo_runtime) {
   /**
    * Function to be executed after page is initialized.
    *
-   * 
    * @param {Object} scriptContext
    * @param {Record} scriptContext.currentRecord - Current form record
    * @param {string} scriptContext.mode - The mode in which the record is being accessed (create, copy, or edit)

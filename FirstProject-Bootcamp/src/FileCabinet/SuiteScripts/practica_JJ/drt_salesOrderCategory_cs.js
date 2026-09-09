@@ -17,7 +17,25 @@ define(["N/runtime", "N/ui/dialog"] /**
    *
    * @since 2015.2
    */
-  function pageInit(scriptContext) {}
+  function pageInit(context) {
+    // Creando mensaje de alerta para el usuario que esta un script asignado aa un registro de cliente en su base de datgos netusite
+    const options = {
+      title: "Hola",
+      message:
+        "Estás editando un registro de cliente con un script asignado. Por favor, revisa la información antes de guardar los cambios.",
+    };
+    // Colocamos nuestra logica entro de un try catch para capturar cualquier error que pueda ocurrir al ejecutar el script obteniendo la informacion de usuario.
+    try {
+      // Se obtiene el nombre del usuario actual y se agrega al titulo de la alerta.
+      options.title += " " + runtime.getCurrentUser().name;
+      // se ejecuta la alerta con el titulo y mensaje preparado.
+      dialog.alert(options);
+      // Se registra en el log que la alerta se mostro correctamente.
+      log.debug("Success", "Alert displayed successfully");
+    } catch (e) {
+      localStorage.error(e.name);
+    }
+  }
 
   /**
    * Function to be executed when field is changed.
@@ -173,5 +191,6 @@ define(["N/runtime", "N/ui/dialog"] /**
 
   return {
     fieldChanged,
+    pageInit,
   };
 });
