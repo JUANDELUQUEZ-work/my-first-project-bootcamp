@@ -3,7 +3,10 @@
  * @NScriptType ClientScript
  * @NModuleScope SameAccount
  */
-define([], function () {
+define(["N/runtime", "N/ui/dialog"] /**
+ * @param{runtime} runtime
+ * @param{dialog} dialog
+ */, function (runtime, dialog) {
   /**
    * Function to be executed after page is initialized.
    *
@@ -13,7 +16,7 @@ define([], function () {
    *
    * @since 2015.2
    */
-  const pageInit = (scriptContext) => {};
+  function pageInit(scriptContext) {}
 
   /**
    * Function to be executed when field is changed.
@@ -28,36 +31,20 @@ define([], function () {
    * @since 2015.2
    */
   function fieldChanged(context) {
+    // desarrollo de ticket - categorias de cliente...
     try {
-      log.debug(`fieldChanged context`, context);
-      var currentRecord = context.currentRecord; // Esta obteniendo el registro actual del contexto
-      var sublistName = context.sublistId; // Esta obteniendo el nombre de la sublista del contexto
-      var sublistFieldName = context.fieldId; // Esta obteniendo el nombre del campo de la sublista del contexto..
-      var line = context.line; // Esta obteniendo el numero de linea del contexto que cambio..
-      log.debug(
-        `valores context`,
-        ` sublistName: ${sublistName} sublistFieldName: ${sublistFieldName} line: ${line}`,
-      );
-
-      // Condicionales
-      if (sublistName === "item" && sublistFieldName === "item") {
-        // Si el nombre de la sublista es "item" y el nombre del campo de la sublista es "item", entonces se ejecuta el siguiente bloque de código.
-        debugger;
-        // Primera condicional: Le da los siguientes valores a los campos de la sublista "item" en la linea actual.
-        currentRecord.setValue({
-          fieldId: "memo",
-          value:
-            `Item: ` +
-            currentRecord.getCurrentSublistValue({
-              sublistId: "item",
-              fieldId: "item",
-            }) +
-            `is selected`,
-        });
+      log.debug('fieldChanged context', context);
+      // Declaramos una varaible para el registro actual que el usuario va a estar editando.
+      var currentRecord = context.currentRecord;
+      // Declaramos una variable para capturar el id del campo que se esta editanod.
+      var fieldId = context.fieldId;
+      // Construimos barrera condicional con el id del campo que queremos monitorear comparado con el id del campo que se esta editando.
+      if (fieldId === 'custentity_lead_category') {
+        // Declaramos una variable para capturar el valor del campo que se esta editando. 
+        const fieldValue = currentRecord.getValue({ fieldId: fieldId});
+        // 
       }
-    } catch (error) {
-      log.error("error fieldChanged", error);
-    }
+    } catch (error) {}
   }
 
   /**

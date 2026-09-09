@@ -71,7 +71,7 @@ define(["N/ui/dialog", "N/runtime"], function (dialog, modulo_runtime) {
       var sublistFieldName = context.fieldId;
 
       // Se obtiene el numero de linea relacionado con el cambio.
-      var line = context.line;
+      var line = context.line; // esto solo funciona en el evento fieldChanged, no en los demas eventos de sublista.
 
       // Se registran los valores importantes del evento para facilitar la depuracion.
       log.debug(
