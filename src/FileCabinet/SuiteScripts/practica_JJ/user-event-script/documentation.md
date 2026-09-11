@@ -85,14 +85,14 @@ src/FileCabinet/SuiteScripts/practica_JJ/user-event-script/
 
 Nombres que se crearán en NetSuite:
 
-| Elemento            | Nombre/ID sugerido                               |
-| ------------------- | ------------------------------------------------ |
-| Archivo             | `drt_customerReviewControl_ue.js`                |
-| Script record       | `DRT - Customer Review Control UE`               |
-| Script ID           | `customscript_drt_customer_review_control_ue`    |
-| Deployment title    | `DRT - Customer Review Control UE - Sandbox`     |
-| Deployment ID       | `customdeploy_drt_customer_review_control_ue`    |
-| Campo personalizado | `custentity_drt_ue_pending_review`               |
+| Elemento            | Nombre/ID sugerido                            |
+| ------------------- | --------------------------------------------- |
+| Archivo             | `drt_customerReviewControl_ue.js`             |
+| Script record       | `DRT - Customer Review Control UE`            |
+| Script ID           | `customscript_drt_customer_review_control_ue` |
+| Deployment title    | `DRT - Customer Review Control UE - Sandbox`  |
+| Deployment ID       | `customdeploy_drt_customer_review_control_ue` |
+| Campo personalizado | `custentity_drt_ue_pending_review`            |
 
 ## Paso a paso de creación
 
