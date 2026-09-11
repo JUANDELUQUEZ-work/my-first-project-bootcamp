@@ -188,9 +188,9 @@ Usa esta sección como bitácora. Complétala mientras avances; al finalizar, de
 | Deployment ID real        |                                     |
 | Ambiente                  | Sandbox / Producción                |
 | Tipo de registro          | Customer                            |
-| Responsable               |                                     |
-| Fecha de inicio           |                                     |
-| Fecha de finalización     |                                     |
+| Responsable               | Juan José Deluquez Hernandez        |
+| Fecha de inicio           | 11/09/2026 12:20                    |
+| Fecha de finalización     | **\*\*\*\***\*\*\***\*\*\*\***      |
 
 ## 2. Alcance implementado
 
@@ -202,29 +202,29 @@ Usa esta sección como bitácora. Complétala mientras avances; al finalizar, de
 
 ## 3. Configuración de NetSuite
 
-| Elemento                | Configuración final | Evidencia o ruta en NetSuite |
-| ----------------------- | ------------------- | ---------------------------- |
-| Campo personalizado     |                     |                              |
-| Archivo en File Cabinet |                     |                              |
-| Script Record           |                     |                              |
-| Deployment              |                     |                              |
-| Aplicación (Applies To) |                     |                              |
-| Eventos del deployment  |                     |                              |
-| Audiencia/roles         |                     |                              |
-| Estado del deployment   |                     |                              |
+| Elemento                | Configuración final   | Evidencia o ruta en NetSuite     |
+| ----------------------- | --------------------- | -------------------------------- |
+| Campo personalizado     | Pendiente de revisión | custentity_drt_ue_pending_review |
+| Archivo en File Cabinet |                       |                                  |
+| Script Record           |                       |                                  |
+| Deployment              |                       |                                  |
+| Aplicación (Applies To) |                       |                                  |
+| Eventos del deployment  |                       |                                  |
+| Audiencia/roles         |                       |                                  |
+| Estado del deployment   |                       |                                  |
 
 ## 4. Diseño técnico
 
-| Elemento                                  | Decisión final | Motivo |
-| ----------------------------------------- | -------------- | ------ |
-| Versión de API                            |                |        |
-| Módulos `N/*`                             |                |        |
-| Constantes e IDs de campos                |                |        |
-| `beforeLoad`                              |                |        |
-| `beforeSubmit`                            |                |        |
-| `afterSubmit`                             |                |        |
-| Manejo de errores y logs                  |                |        |
-| Consideraciones de rendimiento/gobernanza |                |        |
+| Elemento                                  | Decisión final                     | Motivo                                                          |
+| ----------------------------------------- | ---------------------------------- | --------------------------------------------------------------- |
+| Versión de API                            | 2.1                                | Mejor confiuración segun el instructor de la clase del bootcamp |
+| Módulos `N/*`                             | N/log", "N/runtime", "N/ui/message | Conffiguracion del ticket inicial                               |
+| Constantes e IDs de campos                |                                    |                                                                 |
+| `beforeLoad`                              |                                    |                                                                 |
+| `beforeSubmit`                            |                                    |                                                                 |
+| `afterSubmit`                             |                                    |                                                                 |
+| Manejo de errores y logs                  |                                    |                                                                 |
+| Consideraciones de rendimiento/gobernanza |                                    |                                                                 |
 
 Incluye aquí fragmentos breves de código solo cuando aclaren una decisión. El código completo debe permanecer en el archivo `.js`.
 
