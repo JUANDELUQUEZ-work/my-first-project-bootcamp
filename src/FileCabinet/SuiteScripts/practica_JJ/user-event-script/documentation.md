@@ -202,16 +202,16 @@ Usa esta sección como bitácora. Complétala mientras avances; al finalizar, de
 
 ## 3. Configuración de NetSuite
 
-| Elemento                | Configuración final   | Evidencia o ruta en NetSuite     |
-| ----------------------- | --------------------- | -------------------------------- |
-| Campo personalizado     | Pendiente de revisión | custentity_drt_ue_pending_review |
-| Archivo en File Cabinet |                       |                                  |
-| Script Record           |                       |                                  |
-| Deployment              |                       |                                  |
-| Aplicación (Applies To) |                       |                                  |
-| Eventos del deployment  |                       |                                  |
-| Audiencia/roles         |                       |                                  |
-| Estado del deployment   |                       |                                  |
+| Elemento                | Configuración final          | Evidencia o ruta en NetSuite     |
+| ----------------------- | ---------------------------- | -------------------------------- |
+| Campo personalizado     | Pendiente de revisión        | custentity_drt_ue_pending_review |
+| Archivo en File Cabinet | drt_customerReviewControl.js |                                  |
+| Script Record           |                              |                                  |
+| Deployment              |                              |                                  |
+| Aplicación (Applies To) | Formularios de clientes      |                                  |
+| Eventos del deployment  |                              |                                  |
+| Audiencia/roles         |                              |                                  |
+| Estado del deployment   |                              |                                  |
 
 ## 4. Diseño técnico
 

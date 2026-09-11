@@ -68,7 +68,20 @@ define(["N/log", "N/runtime", "N/ui/message"] /**
    * @param {string} scriptContext.type - Trigger type; use values from the context.UserEventType enum
    * @since 2015.2
    */
-  const afterSubmit = (scriptContext) => {};
+  const afterSubmit = (scriptContext) => {
+    // Obtenemos el valor del campo personalizado que indica si el cliente está pendiente de revisión.
+    let pendingReviewLog = context.newRecord.getValue({
+      fieldId: PENDING_REVIEW_FIELD_ID,
+    });
+
+    // Regsitrar un mensaje en el registro de log para indicar si el cliente está pendiente de revisión o no.
+    log.audit({
+      title: "Estado de revisión del cliente",
+      details: pendingReviewLog
+        ? "El cliente está pendiente de revisión."
+        : "El cliente no está pendiente de revisión.",
+    });
+  };
 
   return { beforeLoad, beforeSubmit, afterSubmit };
 });
