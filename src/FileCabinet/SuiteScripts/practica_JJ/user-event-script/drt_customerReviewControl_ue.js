@@ -43,9 +43,21 @@ define(["N/log", "N/runtime", "N/ui/message"] /**
    * @param {string} scriptContext.type - Trigger type; use values from the context.UserEventType enum
    * @since 2015.2
    */
-  const beforeSubmit = (scriptContext) => {
+  const beforeSubmit = (context) => {
     // Constante de ID del campo personalizado
     const PENDING_REVIEW_FIELD_ID = "custentity_drt_ue_pending_review";
+
+    // Comprobar que el contexto de ejecución sea por medio de interfaz de usuario y que el evento que pase sea de creación de un registro de cliente.
+    if (
+      context.type === context.UserEventType.CREATE &&
+      runtime.executionContext === runtime.ContextType.USER_INTERFACE
+    ) {
+      // Establecer el valor del campo personalizado a falso (false) para indicar que el cliente está pendiente de revisión.
+      context.newRecord.setValue({
+        fieldId: PENDING_REVIEW_FIELD_ID,
+        value: false,
+      });
+    }
   };
 
   /**
