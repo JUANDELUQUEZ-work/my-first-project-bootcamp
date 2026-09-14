@@ -18,8 +18,6 @@ Registrar de forma ordenada lo observado durante la clase videograbada sobre Sui
 
 ## Registro de sesiones
 
-Duplica la siguiente plantilla por cada sesión o segmento del video que estudies.
-
 ### Sesión 1
 
 #### Datos de la sesión

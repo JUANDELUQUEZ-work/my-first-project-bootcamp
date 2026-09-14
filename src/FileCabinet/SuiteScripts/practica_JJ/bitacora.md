@@ -4,6 +4,15 @@
 
 Registrar de forma ordenada lo observado durante la clase videograbada sobre Suitelets. Este documento es únicamente una bitácora de estudio; todavía no contiene un ticket de práctica ni define el script que se desarrollará posteriormente.
 
+Es una convención, no una regla de Git. Otros prefijos comunes:
+
+- fix/: corregir un error.
+- docs/: modificar documentación.
+- refactor/: reorganizar código sin cambiar su comportamiento.
+- test/: agregar o modificar pruebas.
+- chore/: mantenimiento o configuración.
+- practice/: ejercicios o aprendizaje.
+
 ## Información general
 
 | Campo                           | Información                     |
