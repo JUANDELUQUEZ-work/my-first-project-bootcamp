@@ -7,6 +7,8 @@ define(["N/log", "N/runtime", "N/ui/message"] /**
  * @param{runtime} runtime
  * @param{message} message
  */, (log, runtime, message) => {
+  // Constante de ID del campo personalizado
+  const PENDING_REVIEW_FIELD_ID = "custentity_drt_ue_pending_review";
   /**
    * Defines the function definition that is executed before record is loaded.
    * @param {Object} scriptContext
@@ -44,18 +46,15 @@ define(["N/log", "N/runtime", "N/ui/message"] /**
    * @since 2015.2
    */
   const beforeSubmit = (context) => {
-    // Constante de ID del campo personalizado
-    const PENDING_REVIEW_FIELD_ID = "custentity_drt_ue_pending_review";
-
     // Comprobar que el contexto de ejecución sea por medio de interfaz de usuario y que el evento que pase sea de creación de un registro de cliente.
     if (
       context.type === context.UserEventType.CREATE &&
       runtime.executionContext === runtime.ContextType.USER_INTERFACE
     ) {
-      // Establecer el valor del campo personalizado a falso (false) para indicar que el cliente está pendiente de revisión.
+      // Establecer el valor del campo personalizado a verdadero (true) para indicar que el cliente está pendiente de revisión.
       context.newRecord.setValue({
         fieldId: PENDING_REVIEW_FIELD_ID,
-        value: false,
+        value: true,
       });
     }
   };
@@ -68,9 +67,9 @@ define(["N/log", "N/runtime", "N/ui/message"] /**
    * @param {string} scriptContext.type - Trigger type; use values from the context.UserEventType enum
    * @since 2015.2
    */
-  const afterSubmit = (scriptContext) => {
+  const afterSubmit = (context) => {
     // Obtenemos el valor del campo personalizado que indica si el cliente está pendiente de revisión.
-    let pendingReviewLog = context.newRecord.getValue({
+    const pendingReviewLog = context.newRecord.getValue({
       fieldId: PENDING_REVIEW_FIELD_ID,
     });
 
@@ -78,8 +77,9 @@ define(["N/log", "N/runtime", "N/ui/message"] /**
     log.audit({
       title: "Estado de revisión del cliente",
       details: pendingReviewLog
-        ? "El cliente está pendiente de revisión."
-        : "El cliente no está pendiente de revisión.",
+        ? // AAgregamos el ID del cliente al mensaje para identifica de qué cliente se trata.
+          `El cliente con ID ${context.newRecord.id} está pendiente de revisión.`
+        : `El cliente con ID ${context.newRecord.id} no está pendiente de revisión.`,
     });
   };
 
