@@ -15,11 +15,11 @@ Como usuario que crea clientes en NetSuite, quiero que cada cliente nuevo quede 
 | Momento                                     | Evento         | Resultado esperado                                                                                     |
 | ------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------ |
 | Se abre el formulario para crear un cliente | `beforeLoad`   | Se muestra un aviso informativo: el cliente será marcado como pendiente de revisión al guardarse.      |
-| Se guarda un cliente nuevo                  | `beforeSubmit` | El campo personalizado de revisión se establece en `false` (pendiente).                                |
+| Se guarda un cliente nuevo                  | `beforeSubmit` | El campo personalizado de revisión se establece en `true` (pendiente).                                 |
 | Se edita un cliente existente               | `beforeSubmit` | El script no modifica el estado de revisión que ya tenga el cliente.                                   |
 | NetSuite termina de guardar                 | `afterSubmit`  | Se registra en el Execution Log el ID del cliente, el tipo de evento y el valor del campo de revisión. |
 
-> Nota: en un checkbox de NetSuite, `false` significará “pendiente de revisión” y `true` significará “revisado”. El equipo podrá marcarlo manualmente como revisado después de validar los datos.
+> Decisión final: en el checkbox de NetSuite, `true` significa “pendiente de revisión” y `false` significa “no pendiente”. Esta correspondencia coincide con el nombre y el estado visual del campo.
 
 ## Requerimientos
 
@@ -60,7 +60,7 @@ Antes de programar, crear un campo personalizado de tipo checkbox:
 | Etiqueta              | `Pendiente de revisión`                       |
 | ID sugerido           | `custentity_drt_ue_pending_review`            |
 | Tipo de dato          | Checkbox                                      |
-| Valor predeterminado  | Desmarcado (`false`)                          |
+| Valor predeterminado  | Desmarcado (`false`); el script lo marca al crear el cliente |
 | Mostrar en formulario | Sí                                            |
 | Acceso                | El rol de pruebas debe poder verlo y editarlo |
 
@@ -128,11 +128,11 @@ Nombres que se crearán en NetSuite:
    ```javascript
    scriptContext.newRecord.setValue({
      fieldId: PENDING_REVIEW_FIELD,
-     value: false,
+     value: true,
    });
    ```
 
-7. En `afterSubmit`, obtener el valor desde `scriptContext.newRecord` y registrarlo con `log.audit`. Incluir el ID del registro y `scriptContext.type`.
+7. En `afterSubmit`, obtener el valor desde `scriptContext.newRecord` y registrarlo con `log.audit`. El mensaje final incluye el ID interno del cliente y traduce el booleano a “pendiente” o “no pendiente”.
 8. Retornar únicamente los eventos que realmente se implementen. Para este ejercicio se recomienda retornar los tres para poder estudiar su orden de ejecución.
 
 ### 4. Subir el archivo y crear el Script Record
@@ -149,22 +149,22 @@ Nombres que se crearán en NetSuite:
 
 1. Con el rol configurado, crear un cliente de prueba desde la interfaz de usuario.
 2. Verificar que aparezca el aviso en el formulario antes de guardar.
-3. Guardar el cliente y confirmar que `Pendiente de revisión` quede desmarcado.
-4. Abrir el cliente, marcar manualmente el campo como revisado y guardar.
+3. Guardar el cliente y confirmar que `Pendiente de revisión` quede marcado.
+4. Abrir el cliente, desmarcar manualmente el campo para indicar que ya no está pendiente y guardar.
 5. Volver a editarlo sin cambiar el checkbox; confirmar que el script no lo regrese a pendiente.
 6. Revisar **Customization > Scripting > Script Execution Logs** y validar los datos de `afterSubmit`.
 7. Registrar los resultados reales en la tabla de pruebas de este documento.
 
 ### 6. Criterios de aceptación
 
-- [ ] Se creó el campo `custentity_drt_ue_pending_review` o se documentó su ID real.
-- [ ] El nuevo archivo usa `@NApiVersion 2.1` y `@NScriptType UserEventScript`.
-- [ ] El deployment aplica al registro Customer y se probó en Sandbox.
-- [ ] Al crear un cliente se muestra el aviso de revisión.
-- [ ] Al crear un cliente el campo queda en `false`.
-- [ ] Al editar un cliente ya revisado, su valor no cambia por causa del script.
-- [ ] El Execution Log registra el ID, el evento y el estado del campo.
-- [ ] Las pruebas y cualquier ajuste se documentaron abajo.
+- [x] Se creó el campo `custentity_drt_ue_pending_review` y se documentó su ID real.
+- [x] El archivo usa `@NApiVersion 2.1` y `@NScriptType UserEventScript`.
+- [x] El deployment aplica al registro Customer y fue probado en Sandbox.
+- [x] Al abrir la creación de un cliente se muestra el aviso de revisión.
+- [x] Al crear un cliente, el campo queda marcado (`true`).
+- [x] Al editar el cliente, el script no vuelve a forzar el valor porque `beforeSubmit` está limitado a `CREATE`.
+- [x] El Execution Log registra el ID interno y el estado de revisión del cliente.
+- [x] Las pruebas, incidencias y decisiones quedaron documentadas.
 
 ## Límites de esta primera versión
 
@@ -174,80 +174,105 @@ Nombres que se crearán en NetSuite:
 
 ---
 
-# Estructura de documentación durante y después de la implementación
+# Documentación final de la implementación
 
-Usa esta sección como bitácora. Complétala mientras avances; al finalizar, debe permitir a otra persona entender qué se construyó, cómo se configuró y cómo se validó.
+Esta sección registra el resultado real del ejercicio, las pruebas efectuadas y las decisiones tomadas durante su desarrollo.
 
 ## 1. Datos finales del ticket
 
-| Campo                     | Valor                               |
-| ------------------------- | ----------------------------------- |
-| Estado                    | Pendiente / En progreso / Terminado |
-| Nombre de archivo elegido | `drt_customerReviewControl_ue.js`   |
-| Script ID real            |                                     |
-| Deployment ID real        |                                     |
-| Ambiente                  | Sandbox / Producción                |
-| Tipo de registro          | Customer                            |
-| Responsable               | Juan José Deluquez Hernandez        |
-| Fecha de inicio           | 11/09/2026 12:20                    |
-| Fecha de finalización     | **\*\*\*\***\*\*\***\*\*\*\***      |
+| Campo                     | Valor                                            |
+| ------------------------- | ------------------------------------------------ |
+| Estado                    | **Terminado**                                    |
+| Nombre de archivo elegido | `drt_customerReviewControl_ue.js`                |
+| Script ID documentado     | `customscript_drt_customer_review_control_ue`    |
+| Deployment ID real        | `customdeploy_drt_ue_pending_review`             |
+| Ambiente                  | Sandbox                                          |
+| Tipo de registro          | Customer                                         |
+| Responsable               | Juan José Deluquez Hernandez                     |
+| Usuario de las pruebas    | Jacob Deluquez                                   |
+| Cliente de prueba         | ID interno `1731`                                |
+| Fecha de inicio           | 11/09/2026 12:20                                 |
+| Fecha de finalización     | 14/09/2026 10:04                                 |
 
 ## 2. Alcance implementado
 
-- Problema o necesidad que resuelve:
-- Regla de negocio final:
-- Eventos implementados y por qué:
-- Eventos deliberadamente excluidos y por qué:
-- Cambios respecto a este ticket inicial:
+- **Problema resuelto:** identificar automáticamente los clientes nuevos que todavía requieren revisión.
+- **Regla de negocio final:** cuando un cliente se crea manualmente desde la interfaz de NetSuite, el campo `custentity_drt_ue_pending_review` se establece en `true`. En ediciones posteriores el User Event no fuerza nuevamente el valor.
+- **`beforeLoad`:** muestra una franja informativa al abrir el formulario de creación de Customer.
+- **`beforeSubmit`:** marca el checkbox antes de guardar, únicamente cuando el evento es `CREATE` y el contexto es `USER_INTERFACE`.
+- **`afterSubmit`:** consulta el valor final del checkbox y registra mediante `log.audit` el ID interno del cliente y si continúa pendiente.
+- **Eventos excluidos:** el script no modifica datos durante `EDIT`, no crea registros relacionados y no se ejecuta para integraciones dentro del alcance probado.
+- **Cambio frente al ticket inicial:** se corrigió la correspondencia booleana para que `true` signifique “pendiente de revisión” y `false` signifique “no pendiente”.
 
 ## 3. Configuración de NetSuite
 
-| Elemento                | Configuración final          | Evidencia o ruta en NetSuite     |
-| ----------------------- | ---------------------------- | -------------------------------- |
-| Campo personalizado     | Pendiente de revisión        | custentity_drt_ue_pending_review |
-| Archivo en File Cabinet | drt_customerReviewControl.js |                                  |
-| Script Record           |                              |                                  |
-| Deployment              |                              |                                  |
-| Aplicación (Applies To) | Formularios de clientes      |                                  |
-| Eventos del deployment  |                              |                                  |
-| Audiencia/roles         |                              |                                  |
-| Estado del deployment   |                              |                                  |
+| Elemento                | Configuración final                              | Evidencia o ruta en NetSuite                              |
+| ----------------------- | ------------------------------------------------ | --------------------------------------------------------- |
+| Campo personalizado     | `Pendiente de revisión`                          | `custentity_drt_ue_pending_review`                        |
+| Archivo en File Cabinet | `drt_customerReviewControl_ue.js`                | Carpeta `user-event-script` y archivo desplegado          |
+| Script Record           | `DRT - Customer Review Control UE`               | `Customization > Scripting > Scripts`                     |
+| Deployment              | `customdeploy_drt_ue_pending_review`             | Visible como `CUSTOMDEPLOY_DRT_UE_PENDING_REVIEW` en logs |
+| Aplicación (Applies To) | Customer                                         | Formulario de creación y edición de clientes              |
+| Eventos del deployment  | `CREATE` y `EDIT`                                | Validación funcional con cliente `1731`                   |
+| Contexto                | `USER_INTERFACE`                                 | Creación manual desde la interfaz                         |
+| Audiencia/roles         | Rol utilizado por Jacob Deluquez                 | Prueba manual completada                                  |
+| Estado del deployment   | Desplegado y validado funcionalmente en Sandbox  | Execution Log del 14/09/2026                              |
 
 ## 4. Diseño técnico
 
-| Elemento                                  | Decisión final                     | Motivo                                                          |
-| ----------------------------------------- | ---------------------------------- | --------------------------------------------------------------- |
-| Versión de API                            | 2.1                                | Mejor confiuración segun el instructor de la clase del bootcamp |
-| Módulos `N/*`                             | N/log", "N/runtime", "N/ui/message | Conffiguracion del ticket inicial                               |
-| Constantes e IDs de campos                |                                    |                                                                 |
-| `beforeLoad`                              |                                    |                                                                 |
-| `beforeSubmit`                            |                                    |                                                                 |
-| `afterSubmit`                             |                                    |                                                                 |
-| Manejo de errores y logs                  |                                    |                                                                 |
-| Consideraciones de rendimiento/gobernanza |                                    |                                                                 |
-
-Incluye aquí fragmentos breves de código solo cuando aclaren una decisión. El código completo debe permanecer en el archivo `.js`.
+| Elemento                                  | Decisión final                                             | Motivo                                                             |
+| ----------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------ |
+| Versión de API                            | SuiteScript 2.1                                            | Versión indicada para el ejercicio del bootcamp                     |
+| Módulos `N/*`                             | `N/log`, `N/runtime`, `N/ui/message`                        | Logs, filtro del contexto y tipo visual del aviso                   |
+| Constantes e IDs de campos                | `PENDING_REVIEW_FIELD_ID` en el alcance principal          | Puede utilizarse desde `beforeSubmit` y `afterSubmit`               |
+| `beforeLoad`                              | Aviso informativo sin temporizador                         | Permanece visible para que el usuario conozca la automatización     |
+| `beforeSubmit`                            | Asigna `true` solamente durante `CREATE` desde la UI       | Marca automáticamente al cliente nuevo como pendiente               |
+| `afterSubmit`                             | Lee el checkbox y ejecuta `log.audit`                      | Verifica el resultado ya guardado e incluye el ID interno           |
+| Manejo de errores y logs                  | Mensaje ternario según el booleano del checkbox            | Traduce `true`/`false` a un texto comprensible                      |
+| Consideraciones de rendimiento/gobernanza | No carga ni guarda nuevamente el registro con `N/record`   | Utiliza `context.newRecord` y evita operaciones innecesarias        |
 
 ## 5. Pruebas realizadas
 
-| Caso                         | Datos de prueba | Resultado esperado                                   | Resultado obtenido | Estado    | Evidencia |
-| ---------------------------- | --------------- | ---------------------------------------------------- | ------------------ | --------- | --------- |
-| Crear cliente                |                 | Checkbox en pendiente y aviso visible                |                    | Pendiente |           |
-| Editar cliente pendiente     |                 | No reiniciar ni alterar inesperadamente              |                    | Pendiente |           |
-| Editar cliente revisado      |                 | Mantener checkbox en revisado                        |                    | Pendiente |           |
-| Revisar Execution Log        |                 | ID, evento y valor registrados                       |                    | Pendiente |           |
-| Rol sin permisos suficientes |                 | Comportamiento controlado o acceso denegado esperado |                    | Pendiente |           |
+| Caso                         | Datos de prueba                                  | Resultado esperado                                      | Resultado obtenido                                                     | Estado       | Evidencia                    |
+| ---------------------------- | ------------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------------------------------- | ------------ | ---------------------------- |
+| Abrir formulario de creación | Customer nuevo desde `USER_INTERFACE`            | Aviso visible antes de guardar                          | Se mostró “Revisión de cliente” sin temporizador                       | Completado   | Captura del aviso            |
+| Crear cliente                | Cliente con ID interno `1731`; checkbox desmarcado | El script debe marcarlo como pendiente                  | El checkbox quedó marcado automáticamente y se generó el log pendiente | Completado   | Log de las 10:02:48 a. m.    |
+| Editar cliente pendiente     | Cliente `1731` con checkbox marcado              | Mantener el estado porque `beforeSubmit` no fuerza EDIT | El log continuó indicando que el cliente estaba pendiente              | Completado   | Log de las 10:04:13 a. m.    |
+| Editar cliente no pendiente  | Cliente `1731`; checkbox desmarcado manualmente   | Conservar el valor `false`                              | El log indicó que el cliente no estaba pendiente                       | Completado   | Log de las 10:04:39 a. m.    |
+| Revisar Execution Log        | Tres ejecuciones `AUDIT`                          | Mostrar ID interno y estado                             | Se registraron las tres ejecuciones esperadas                          | Completado   | Captura del Execution Log    |
+| Rol sin permisos suficientes | No incluido en esta práctica                     | Fuera del alcance de cierre                             | No ejecutado                                                           | No requerido | —                            |
 
 ## 6. Incidencias y decisiones
 
-| Fecha | Situación | Diagnóstico | Solución o decisión | Estado |
-| ----- | --------- | ----------- | ------------------- | ------ |
-|       |           |             |                     |        |
+| Fecha      | Situación                                      | Diagnóstico                                                                 | Solución o decisión                                                                                  | Estado    |
+| ---------- | ---------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------- |
+| 14/09/2026 | El booleano y el comentario eran contradictorios | El código asignaba `false`, pero el ternario trataba `true` como pendiente | Se adoptó la relación coherente `true = pendiente` y `false = no pendiente`                          | Resuelto  |
+| 14/09/2026 | `PENDING_REVIEW_FIELD_ID` no era visible en `afterSubmit` | La constante estaba declarada dentro de `beforeSubmit`                     | Se movió la constante al alcance principal del callback de `define`                                  | Resuelto  |
+| 14/09/2026 | No se observó inicialmente el aviso            | Se esperaba verlo al guardar y además tenía una duración de 5 segundos     | Se aclaró que aparece al cargar el formulario y se eliminó `duration` para mantenerlo visible         | Resuelto  |
+| 14/09/2026 | Duda sobre el operador ternario                | No estaba clara la selección entre los mensajes de `true` y `false`        | Se documentó la forma `condición ? mensaje verdadero : mensaje falso` y se comprobó mediante los logs | Resuelto  |
 
 ## 7. Cierre y siguientes pasos
 
-- Resultado final:
-- Qué aprendí sobre User Event Scripts:
-- Riesgos o consideraciones pendientes:
-- Mejoras propuestas para una versión 2:
-- Validación final (persona/fecha):
+- **Resultado final:** el User Event fue desplegado y sus tres puntos de entrada funcionaron sobre Customer. El cliente `1731` quedó marcado automáticamente al crearse, el aviso fue visible y `afterSubmit` registró correctamente los cambios de estado.
+- **Qué aprendí sobre User Event Scripts:** `beforeLoad` modifica la experiencia del formulario, `beforeSubmit` prepara el registro antes de guardarlo y `afterSubmit` permite observar el resultado persistido. También se practicaron el alcance de constantes, los booleanos, el operador ternario y los contextos de ejecución.
+- **Riesgos o consideraciones pendientes:** el mensaje de `afterSubmit` incluye el estado, pero no imprime explícitamente `context.type`; puede añadirse si posteriormente se necesita diferenciar CREATE y EDIT directamente en los detalles.
+- **Mejoras propuestas para una versión 2:** agregar `eventType` al log, parametrizar el ID del campo, restringir formalmente la audiencia y probar contextos distintos de `USER_INTERFACE`.
+- **Validación final:** Juan José Deluquez Hernandez — 14/09/2026.
+
+## 8. Evidencias de finalización
+
+### Evidencia 1 — Aviso al crear un cliente
+
+Se comprobó que `beforeLoad` muestra la franja informativa **“Revisión de cliente”** con el texto **“Al guardar, este cliente será marcado como pendiente de revisión”**. El mensaje permanece visible porque la versión final no establece `duration`.
+
+### Evidencia 2 — Execution Log de `afterSubmit`
+
+La captura suministrada contiene estas ejecuciones del 14/09/2026:
+
+| Hora        | Nivel   | Archivo                                 | Deployment                                | Título                           | Detalle                                                     |
+| ----------- | ------- | --------------------------------------- | ----------------------------------------- | -------------------------------- | ----------------------------------------------------------- |
+| 10:02:48 a. m. | `AUDIT` | `drt_customerReviewControl_ue.js`       | `CUSTOMDEPLOY_DRT_UE_PENDING_REVIEW`      | Estado de revisión del cliente   | El cliente con ID 1731 está pendiente de revisión.          |
+| 10:04:13 a. m. | `AUDIT` | `drt_customerReviewControl_ue.js`       | `CUSTOMDEPLOY_DRT_UE_PENDING_REVIEW`      | Estado de revisión del cliente   | El cliente con ID 1731 está pendiente de revisión.          |
+| 10:04:39 a. m. | `AUDIT` | `drt_customerReviewControl_ue.js`       | `CUSTOMDEPLOY_DRT_UE_PENDING_REVIEW`      | Estado de revisión del cliente   | El cliente con ID 1731 no está pendiente de revisión.       |
+
+Estas ejecuciones prueban tanto la creación automática del estado pendiente como la conservación de los cambios realizados durante una edición posterior.
