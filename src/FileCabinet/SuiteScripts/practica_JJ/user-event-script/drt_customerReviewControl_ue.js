@@ -31,8 +31,9 @@ define(["N/log", "N/runtime", "N/ui/message"] /**
         title: "Revisión de cliente",
         message:
           "Al guardar, este cliente sera marcado como penidente de revisión.",
-        // Duraciòn en milisegundos que el mensaje se mostrara en pantalla antes de desaparecer.
-        duration: 5000,
+        /*         // Duraciòn en milisegundos que el mensaje se mostrara en pantalla antes de desaparecer.
+           // Se deja sin temporizador de tiempo parar que el cleinte este muy al pendiente de que estat creacion de un nuevo registro tiene este script asignao. 
+        duration: 5000, */
       });
     }
   };
