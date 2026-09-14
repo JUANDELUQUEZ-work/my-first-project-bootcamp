@@ -1,5 +1,7 @@
 # Bitácora de clase — Suitelet
 
+enter
+
 ## Propósito
 
 Registrar de forma ordenada lo observado durante la clase videograbada sobre Suitelets. Este documento es únicamente una bitácora de estudio; todavía no contiene un ticket de práctica ni define el script que se desarrollará posteriormente.
