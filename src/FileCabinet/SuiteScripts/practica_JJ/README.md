@@ -11,12 +11,23 @@ Esta carpeta reúne las prácticas de NetSuite organizadas por tipo de script. L
 
 En esta categoría se documentan los módulos utilizados por cada script junto con sus eventos. Por ejemplo, `drt_salesOrderCategory_cs.js` usa `N/runtime` y `N/ui/dialog` dentro del mismo Client Script.
 
+### User Event Script
+
+- [Bitácora de la clase videograbaad](./user-event-sript/documentation.md)
+
+Esta carpeta contiene una practica del tipo de script de User Event. con pruebas de finalizacion.
+
+### Suitelets
+
+- [Bitácora de la clase videograbada](./suitelets/bitacora.md)
+
+Esta carpeta contiene por ahora únicamente apuntes de estudio. El ticket y los archivos de la práctica se agregarán cuando se defina el ejercicio.
+
 ### Próximos tipos
 
 Cuando se agreguen nuevas prácticas, pueden crearse secciones y carpetas documentales equivalentes:
 
 - `scheduled/` para Scheduled Scripts.
 - `map-reduce/` para Map/Reduce Scripts.
-- `suitelets/` para Suitelets.
 
 Los módulos no se separan como categoría principal: se documentan dentro del tipo de script que los consume. Así se conserva el contexto de los eventos y se evita dividir una práctica en varios lugares solo porque utiliza más de un módulo.
