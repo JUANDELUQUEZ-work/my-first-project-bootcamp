@@ -28,6 +28,7 @@ define([
    * @param {ServerRequest} scriptContext.request Contiene método y parámetros.
    * @param {ServerResponse} scriptContext.response Permite responder al cliente.
    */
+  // Punto de entrada que NetSuite ejecuta cada vez que alguien abre o envía el Suitelet.
   const onRequest = (scriptContext) => {
     // Registra el método HTTP y el contexto para facilitar la depuración.
     // `log` es un objeto global proporcionado por NetSuite, por eso no se importa.
