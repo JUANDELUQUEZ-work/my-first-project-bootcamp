@@ -171,6 +171,6 @@ define([
   // Expone `onRequest` como punto de entrada público. NetSuite busca esta función
   // porque el encabezado declaró que el archivo es de tipo Suitelet.
   return {
-    onRequest,
+    onRequest: onRequest,
   };
 });
