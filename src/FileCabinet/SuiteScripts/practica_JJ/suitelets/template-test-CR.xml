@@ -148,13 +148,13 @@
 <body header="nlheader" header-height="10%" footer="nlfooter" footer-height="20pt" padding="0.5in 0.5in 0.5in 0.5in" size="Letter">
     <table style="width: 100%; margin-top: 10px;">
     <tr>
-    <!-- derecha - colspan-->
+    <!-- derecha - colspan - Celdas que ocupa -->
         <td class="addressheader" colspan="3"><b>${record.billaddress@label}</b></td>
         <td class="addressheader" colspan="3"><b>${record.shipaddress@label}</b></td>
         <td class="totalboxtop" colspan="5"><b>${record.total@label?upper_case}</b></td>
     </tr>
     <tr>
-    <!-- Abajo - rowspan-->
+    <!-- Abajo - rowspan - Celdas que ocupa -->
         <td class="address" colspan="3" rowspan="2">${record.billaddress}</td>
         <td class="address" colspan="3" rowspan="2">${record.shipaddress}</td>
         <td class="totalboxmid" align="right" colspan="5">${record.total}</td>
