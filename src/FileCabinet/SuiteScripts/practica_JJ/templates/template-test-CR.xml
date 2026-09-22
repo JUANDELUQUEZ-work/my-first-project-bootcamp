@@ -1,0 +1,456 @@
+<?xml version="1.0"?>
+<#-- Declara que el documento generado usa la sintaxis XML 1.0. -->
+<#-- Declara el tipo de documento BFO Report 1.1 que NetSuite utiliza para convertir la plantilla en PDF. -->
+<!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
+<#-- Abre el documento PDF que procesara el motor BFO de NetSuite. -->
+<pdf>
+<#-- Abre la cabecera tecnica del documento, donde se definen recursos, macros y estilos. -->
+<head>
+	<#-- Registra Noto Sans y sus variantes mediante las fuentes que NetSuite pone a disposicion de la plantilla. bytes="2" habilita caracteres multibyte. -->
+	<link name="NotoSans" type="font" subtype="truetype" src="${nsfont.NotoSans_Regular}" src-bold="${nsfont.NotoSans_Bold}" src-italic="${nsfont.NotoSans_Italic}" src-bolditalic="${nsfont.NotoSans_BoldItalic}" bytes="2" />
+	<#-- Comprueba si la configuracion regional actual corresponde a chino simplificado. -->
+	<#if .locale == "zh_CN">
+		<#-- Registra la fuente CJK para mostrar correctamente texto en chino simplificado. -->
+		<link name="NotoSansCJKsc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKsc_Regular}" src-bold="${nsfont.NotoSansCJKsc_Bold}" bytes="2" />
+	<#-- Si no es chino simplificado, comprueba si es chino tradicional. -->
+	<#elseif .locale == "zh_TW">
+		<#-- Registra la fuente CJK para mostrar correctamente texto en chino tradicional. -->
+		<link name="NotoSansCJKtc" type="font" subtype="opentype" src="${nsfont.NotoSansCJKtc_Regular}" src-bold="${nsfont.NotoSansCJKtc_Bold}" bytes="2" />
+	<#-- Si no coincide con los idiomas anteriores, comprueba si es japones. -->
+	<#elseif .locale == "ja_JP">
+		<#-- Registra la fuente CJK para mostrar correctamente texto en japones. -->
+		<link name="NotoSansCJKjp" type="font" subtype="opentype" src="${nsfont.NotoSansCJKjp_Regular}" src-bold="${nsfont.NotoSansCJKjp_Bold}" bytes="2" />
+	<#-- Si no coincide con los idiomas anteriores, comprueba si es coreano. -->
+	<#elseif .locale == "ko_KR">
+		<#-- Registra la fuente CJK para mostrar correctamente texto en coreano. -->
+		<link name="NotoSansCJKkr" type="font" subtype="opentype" src="${nsfont.NotoSansCJKkr_Regular}" src-bold="${nsfont.NotoSansCJKkr_Bold}" bytes="2" />
+	<#-- Si no coincide con los idiomas anteriores, comprueba si es tailandes. -->
+	<#elseif .locale == "th_TH">
+		<#-- Registra la fuente especifica necesaria para mostrar correctamente texto tailandes. -->
+		<link name="NotoSansThai" type="font" subtype="opentype" src="${nsfont.NotoSansThai_Regular}" src-bold="${nsfont.NotoSansThai_Bold}" bytes="2" />
+	<#-- Cierra la seleccion condicional de fuentes por idioma. -->
+	</#if>
+    <#-- Abre la lista de macros reutilizables del encabezado y pie de pagina. -->
+    <macrolist>
+        <#-- Define la macro nlheader que se repetira como encabezado de cada pagina. -->
+        <macro id="nlheader">
+            <#-- Crea una tabla de encabezado que ocupa todo el ancho disponible. -->
+            <table class="header" style="width: 100%;">
+                <#-- Abre la primera fila del encabezado. -->
+                <tr>
+                    <#-- Esta celda ocupa tres filas y contiene los datos de la empresa. -->
+                    <td rowspan="3">
+                    <#-- Solo intenta mostrar el logotipo cuando la URL configurada no esta vacia. -->
+                    <#if companyInformation.logoUrl?length != 0>
+                        <#-- Carga el logotipo desde el File Cabinet y lo alinea a la izquierda con un margen de 7 pixeles. -->
+                        <@filecabinet nstype="image" style="float: left; margin: 7px" src="${companyInformation.logoUrl}" />
+                    <#-- Termina la condicion que controla la presencia del logotipo. -->
+                    </#if>
+                        <#-- Imprime el nombre de la empresa y agrega un salto de linea. -->
+                        <span class="nameandaddress">${companyInformation.companyName}</span><br />
+                        <#-- Imprime la direccion de la empresa usando el texto formateado por NetSuite. -->
+                        <span class="nameandaddress">${companyInformation.addressText}</span>
+                    <#-- Cierra la celda que contiene logotipo, nombre y direccion. -->
+                    </td>
+                    <#-- Muestra a la derecha el titulo localizado del tipo de transaccion. -->
+                    <td align="right"><span class="title">${record@title}</span></td>
+                <#-- Cierra la primera fila del encabezado. -->
+                </tr>
+                <#-- Abre la segunda fila del encabezado. -->
+                <tr>
+                    <#-- Muestra a la derecha el numero de transaccion precedido por el signo numeral. -->
+                    <td align="right"><span class="number">#${record.tranid}</span></td>
+                <#-- Cierra la segunda fila del encabezado. -->
+                </tr>
+                <#-- Abre la tercera fila del encabezado. -->
+                <tr>
+                    <#-- Muestra a la derecha la fecha de la transaccion. -->
+                    <td align="right">${record.trandate}</td>
+                <#-- Cierra la tercera fila del encabezado. -->
+                </tr>
+            <#-- Cierra la tabla del encabezado. -->
+            </table>
+        <#-- Cierra la definicion de la macro nlheader. -->
+        </macro>
+        <#-- Define la macro nlfooter que se repetira como pie de cada pagina. -->
+        <macro id="nlfooter">
+            <#-- Crea una tabla de pie de pagina que ocupa todo el ancho disponible. -->
+            <table class="footer" style="width: 100%;">
+                <#-- Abre la unica fila del pie de pagina. -->
+                <tr>
+                    <#-- Abre la celda izquierda que contendra el codigo de barras. -->
+                    <td>
+                        <#-- Genera un codigo de barras Code 128 con el numero de transaccion y tambien muestra su texto. -->
+                        <barcode codetype="code128" showtext="true" value="${record.tranid}"/>
+                    <#-- Cierra la celda del codigo de barras. -->
+                    </td>
+                    <#-- Abre la celda derecha donde se mostrara la numeracion de paginas. -->
+                    <td align="right">
+                        <#-- Imprime el numero de la pagina actual, la palabra "of" y el total de paginas. -->
+                        <pagenumber/> of <totalpages/>
+                    <#-- Cierra la celda de numeracion. -->
+                    </td>
+                <#-- Cierra la fila del pie de pagina. -->
+                </tr>
+            <#-- Cierra la tabla del pie de pagina. -->
+            </table>
+        <#-- Cierra la definicion de la macro nlfooter. -->
+        </macro>
+    <#-- Cierra la lista de macros. -->
+    </macrolist>
+    <#-- Abre la hoja de estilos que controla la apariencia del PDF. -->
+    <style>
+		<#-- El selector universal aplica la familia tipografica a todos los elementos. -->
+		* {
+		<#-- Si el idioma es chino simplificado, agrega su fuente CJK como alternativa a Noto Sans. -->
+		<#if .locale == "zh_CN">
+			<#-- Define la cadena de fuentes para chino simplificado y conserva sans-serif como ultimo respaldo. -->
+			font-family: NotoSans, NotoSansCJKsc, sans-serif;
+		<#-- Si el idioma es chino tradicional, selecciona su variante CJK. -->
+		<#elseif .locale == "zh_TW">
+			<#-- Define la cadena de fuentes para chino tradicional. -->
+			font-family: NotoSans, NotoSansCJKtc, sans-serif;
+		<#-- Si el idioma es japones, selecciona su variante CJK. -->
+		<#elseif .locale == "ja_JP">
+			<#-- Define la cadena de fuentes para japones. -->
+			font-family: NotoSans, NotoSansCJKjp, sans-serif;
+		<#-- Si el idioma es coreano, selecciona su variante CJK. -->
+		<#elseif .locale == "ko_KR">
+			<#-- Define la cadena de fuentes para coreano. -->
+			font-family: NotoSans, NotoSansCJKkr, sans-serif;
+		<#-- Si el idioma es tailandes, selecciona la fuente Noto Sans Thai. -->
+		<#elseif .locale == "th_TH">
+			<#-- Define la cadena de fuentes para tailandes. -->
+			font-family: NotoSans, NotoSansThai, sans-serif;
+		<#-- Para cualquier otro idioma, utiliza la fuente general Noto Sans. -->
+		<#else>
+			<#-- Define Noto Sans como fuente principal y sans-serif como respaldo. -->
+			font-family: NotoSans, sans-serif;
+		<#-- Cierra la seleccion condicional de la familia tipografica. -->
+		</#if>
+		<#-- Cierra la regla del selector universal. -->
+		}
+		<#-- Inicia los estilos generales de todas las tablas. -->
+		table {
+			<#-- Establece el texto de las tablas en 9 puntos. -->
+			font-size: 9pt;
+			<#-- Usa un algoritmo de ancho fijo para que las columnas respeten el espacio asignado. -->
+			table-layout: fixed;
+		<#-- Cierra los estilos generales de las tablas. -->
+		}
+        <#-- Inicia los estilos de todas las celdas de encabezado th. -->
+        th {
+            <#-- Presenta el texto del encabezado en negritas. -->
+            font-weight: bold;
+            <#-- Establece el texto de los encabezados en 8 puntos. -->
+            font-size: 8pt;
+            <#-- Centra verticalmente el contenido dentro de cada encabezado. -->
+            vertical-align: middle;
+            <#-- Agrega 5 px arriba, 6 px a los lados y 3 px abajo. -->
+            padding: 5px 6px 3px;
+            <#-- Asigna un fondo gris claro a los encabezados. -->
+            background-color: #e3e3e3;
+            <#-- Asigna un gris oscuro al texto de los encabezados. -->
+            color: #333333;
+        <#-- Cierra los estilos de las celdas th. -->
+        }
+        <#-- Inicia los estilos generales de todas las celdas de datos td. -->
+        td {
+            <#-- Agrega 4 px verticales y 6 px horizontales de espacio interno. -->
+            padding: 4px 6px;
+        <#-- Cierra los estilos generales de las celdas td. -->
+        }
+		<#-- Alinea a la izquierda los parrafos que esten dentro de una celda. -->
+		td p { align:left }
+        <#-- Inicia los estilos de todo texto encerrado en la etiqueta b. -->
+        b {
+            <#-- Aplica negritas al texto. -->
+            font-weight: bold;
+            <#-- Colorea el texto en gris oscuro. -->
+            color: #333333;
+        <#-- Cierra los estilos de la etiqueta b. -->
+        }
+        <#-- Inicia los estilos de las celdas pertenecientes a la tabla del encabezado. -->
+        table.header td {
+            <#-- Elimina el espacio interno de las celdas del encabezado. -->
+            padding: 0px;
+            <#-- Establece su texto en 10 puntos. -->
+            font-size: 10pt;
+        <#-- Cierra los estilos de las celdas del encabezado. -->
+        }
+        <#-- Inicia los estilos de las celdas pertenecientes a la tabla del pie. -->
+        table.footer td {
+            <#-- Elimina el espacio interno de las celdas del pie. -->
+            padding: 0px;
+            <#-- Establece su texto en 8 puntos. -->
+            font-size: 8pt;
+        <#-- Cierra los estilos de las celdas del pie. -->
+        }
+        <#-- Inicia los estilos de los encabezados de la tabla de articulos. -->
+        table.itemtable th {
+            <#-- Agrega 10 px de espacio debajo del texto de cada encabezado. -->
+            padding-bottom: 10px;
+            <#-- Agrega 10 px de espacio encima del texto de cada encabezado. -->
+            padding-top: 10px;
+        <#-- Cierra los estilos de los encabezados de articulos. -->
+        }
+        <#-- Inicia los estilos de las celdas de la tabla con clase body. -->
+        table.body td {
+            <#-- Reduce el espacio superior de esas celdas a 2 px. -->
+            padding-top: 2px;
+        <#-- Cierra los estilos de las celdas de la tabla body. -->
+        }
+        <#-- Inicia los estilos de la tabla de totales. -->
+        table.total {
+            <#-- Evita que el motor divida la tabla de totales entre dos paginas. -->
+            page-break-inside: avoid;
+        <#-- Cierra los estilos de la tabla de totales. -->
+        }
+        <#-- Inicia los estilos de la fila que presenta el total final. -->
+        tr.totalrow {
+            <#-- Da un fondo gris claro a la fila del total. -->
+            background-color: #e3e3e3;
+            <#-- Duplica la altura de linea para resaltar y espaciar la fila. -->
+            line-height: 200%;
+        <#-- Cierra los estilos de la fila del total. -->
+        }
+        <#-- Inicia los estilos de la parte superior del recuadro de total. -->
+        td.totalboxtop {
+            <#-- Establece su texto en 12 puntos. -->
+            font-size: 12pt;
+            <#-- Da un fondo gris claro a la parte superior del recuadro. -->
+            background-color: #e3e3e3;
+        <#-- Cierra los estilos de totalboxtop. -->
+        }
+        <#-- Inicia los estilos de las celdas que titulan las direcciones. -->
+        td.addressheader {
+            <#-- Establece el texto de los titulos de direccion en 8 puntos. -->
+            font-size: 8pt;
+            <#-- Agrega 6 px de espacio superior. -->
+            padding-top: 6px;
+            <#-- Agrega 2 px de espacio inferior. -->
+            padding-bottom: 2px;
+        <#-- Cierra los estilos de los titulos de direccion. -->
+        }
+        <#-- Inicia los estilos de las celdas que contienen las direcciones. -->
+        td.address {
+            <#-- Elimina el espacio superior para acercar la direccion a su titulo. -->
+            padding-top: 0px;
+        <#-- Cierra los estilos de las direcciones. -->
+        }
+        <#-- Inicia los estilos de la parte central del recuadro de total. -->
+        td.totalboxmid {
+            <#-- Presenta el importe total con un tamaño destacado de 28 puntos. -->
+            font-size: 28pt;
+            <#-- Agrega 20 px de espacio encima del importe. -->
+            padding-top: 20px;
+            <#-- Asigna un fondo rojo a la celda central del total. -->
+            background-color: #ec0d0d;
+        <#-- Cierra los estilos de totalboxmid. -->
+        }
+        <#-- Inicia los estilos de la parte inferior del recuadro de total. -->
+        td.totalboxbot {
+            <#-- Da un fondo gris claro a la parte inferior del recuadro. -->
+            background-color: #e3e3e3;
+            <#-- Presenta su contenido en negritas. -->
+            font-weight: bold;
+        <#-- Cierra los estilos de totalboxbot. -->
+        }
+        <#-- Inicia los estilos del titulo principal de la transaccion. -->
+        span.title {
+            <#-- Muestra el titulo con un tamaño destacado de 28 puntos. -->
+            font-size: 28pt;
+        <#-- Cierra los estilos del titulo. -->
+        }
+        <#-- Inicia los estilos del numero de transaccion. -->
+        span.number {
+            <#-- Muestra el numero con un tamaño de 16 puntos. -->
+            font-size: 16pt;
+        <#-- Cierra los estilos del numero. -->
+        }
+        <#-- Inicia los estilos del nombre de cada articulo. -->
+        span.itemname {
+            <#-- Presenta el nombre del articulo en negritas. -->
+            font-weight: bold;
+            <#-- Usa una altura de linea del 150 por ciento para separar nombre y descripcion. -->
+            line-height: 150%;
+        <#-- Cierra los estilos del nombre de articulo. -->
+        }
+        <#-- Inicia los estilos de las lineas horizontales. -->
+        hr {
+            <#-- Extiende la linea por todo el ancho disponible. -->
+            width: 100%;
+            <#-- Define el color gris claro del borde de la linea. -->
+            color: #d3d3d3;
+            <#-- Define el mismo gris claro como fondo de la linea. -->
+            background-color: #d3d3d3;
+            <#-- Reduce la altura de la linea a un pixel. -->
+            height: 1px;
+        <#-- Cierra los estilos de las lineas horizontales. -->
+        }
+    <#-- Cierra la hoja de estilos. -->
+    </style>
+<#-- Cierra la cabecera tecnica del documento. -->
+</head>
+<#-- Abre el contenido visible del PDF, asigna las macros de encabezado y pie, fija sus alturas, agrega margenes de media pulgada y usa papel Carta. -->
+<body header="nlheader" header-height="10%" footer="nlfooter" footer-height="20pt" padding="0.5in 0.5in 0.5in 0.5in" size="Letter">
+    <#-- Crea la tabla superior de direcciones y total, a todo el ancho y separada 10 px del encabezado. -->
+    <table style="width: 100%; margin-top: 10px;">
+    <#-- Abre la fila de titulos para las direcciones y el total. -->
+    <tr>
+    <#-- colspan indica cuantas columnas horizontales ocupa cada celda. -->
+        <#-- Muestra en negritas la etiqueta localizada de la direccion de facturacion y ocupa tres columnas. -->
+        <td class="addressheader" colspan="3"><b>${record.billaddress@label}</b></td>
+        <#-- Muestra en negritas la etiqueta localizada de la direccion de envio y ocupa tres columnas. -->
+        <td class="addressheader" colspan="3"><b>${record.shipaddress@label}</b></td>
+        <#-- Muestra la etiqueta localizada del total en mayusculas y ocupa cinco columnas. -->
+        <td class="totalboxtop" colspan="5"><b>${record.total@label?upper_case}</b></td>
+    <#-- Cierra la fila de titulos. -->
+    </tr>
+    <#-- Abre la fila que contiene las direcciones y el importe total. -->
+    <tr>
+    <#-- rowspan indica cuantas filas verticales ocupa una celda. -->
+        <#-- Imprime la direccion de facturacion; ocupa tres columnas y se extiende por dos filas. -->
+        <td class="address" colspan="3" rowspan="2">${record.billaddress}</td>
+        <#-- Imprime la direccion de envio; ocupa tres columnas y se extiende por dos filas. -->
+        <td class="address" colspan="3" rowspan="2">${record.shipaddress}</td>
+        <#-- Imprime el total alineado a la derecha dentro de una celda de cinco columnas. -->
+        <td class="totalboxmid" align="right" colspan="5">${record.total}</td>
+    <#-- Cierra la fila de direcciones e importe. -->
+    </tr>
+    <#-- Abre la fila inferior del recuadro de total. -->
+    <tr>
+        <#-- Muestra la etiqueta y el valor de la fecha de vencimiento, alineados a la derecha. -->
+        <td class="totalboxbot" align="right" colspan="5"><b>${record.duedate@label}:</b> ${record.duedate}</td>
+    <#-- Cierra la fila de fecha de vencimiento. -->
+    </tr>
+<#-- Cierra la tabla superior de direcciones y total. -->
+</table>
+<#-- Crea la tabla de datos generales de la transaccion. -->
+<table class="body" style="width: 100%; margin-top: 10px;">
+    <#-- Abre la fila de encabezados de datos generales. -->
+    <tr>
+        <#-- Muestra la etiqueta localizada de los terminos de pago. -->
+        <th>${record.terms@label}</th>
+        <#-- Muestra la etiqueta localizada de la fecha de vencimiento. -->
+        <th>${record.duedate@label}</th>
+        <#-- Muestra la etiqueta localizada del numero de referencia externo. -->
+        <th>${record.otherrefnum@label}</th>
+        <#-- Muestra la etiqueta localizada del representante de ventas. -->
+        <th>${record.salesrep@label}</th>
+        <#-- Muestra la etiqueta localizada del metodo de envio. -->
+        <th>${record.shipmethod@label}</th>
+        <#-- Muestra la etiqueta localizada del socio asociado. -->
+        <th>${record.partner@label}</th>
+    <#-- Cierra la fila de encabezados. -->
+    </tr>
+    <#-- Abre la fila que contiene los valores de los datos generales. -->
+    <tr>
+        <#-- Imprime los terminos de pago de la transaccion. -->
+        <td>${record.terms}</td>
+        <#-- Imprime la fecha de vencimiento. -->
+        <td>${record.duedate}</td>
+        <#-- Imprime el numero de referencia externo. -->
+        <td>${record.otherrefnum}</td>
+        <#-- Imprime el representante de ventas. -->
+        <td>${record.salesrep}</td>
+        <#-- Imprime el metodo de envio. -->
+        <td>${record.shipmethod}</td>
+        <#-- Imprime el socio asociado. -->
+        <td>${record.partner}</td>
+    <#-- Cierra la fila de valores. -->
+    </tr>
+<#-- Cierra la tabla de datos generales. -->
+</table>
+<#-- Solo genera la tabla de articulos cuando la sublista record.item contiene al menos un elemento. -->
+<#if record.item?has_content>
+<#-- Crea la tabla de articulos a todo el ancho y con un margen superior de 10 px. -->
+<table class="itemtable" style="width: 100%; margin-top: 10px;">
+    <#-- Marca el inicio de la seccion de articulos. -->
+    <!-- start items -->
+    <#-- Recorre la sublista de articulos y guarda el elemento actual en la variable item. -->
+    <#list record.item as item>
+        <#-- Genera el encabezado una sola vez, durante la primera iteracion cuyo indice es cero. -->
+        <#if item_index==0>
+            <#-- Abre el encabezado repetible de la tabla de articulos. -->
+            <thead>
+            <#-- Abre la fila con los nombres de las columnas de articulos. -->
+            <tr>
+                <#-- Muestra la etiqueta de cantidad, centrada y con un ancho equivalente a tres columnas. -->
+                <th colspan="3" align="center">${item.quantity@label}</th>
+                <#-- Muestra la etiqueta del articulo y reserva doce columnas para nombre y descripcion. -->
+                <th colspan="12">${item.item@label}</th>
+                <#-- Muestra la etiqueta de opciones del articulo y ocupa tres columnas. -->
+                <th colspan="3">${item.options@label}</th>
+                <#-- Muestra la etiqueta de tarifa alineada a la derecha y ocupa cuatro columnas. -->
+                <th colspan="4" align="right">${item.rate@label}</th>
+                <#-- Muestra la etiqueta de importe alineada a la derecha y ocupa cuatro columnas. -->
+                <th colspan="4" align="right">${item.amount@label}</th>
+            <#-- Cierra la fila de encabezados de articulos. -->
+            </tr>
+            <#-- Cierra el encabezado repetible de la tabla. -->
+            </thead>
+        <#-- Cierra la condicion que limita el encabezado a la primera iteracion. -->
+        </#if>
+        <#-- Abre una fila para el articulo de la iteracion actual. -->
+        <tr>
+            <#-- Imprime la cantidad centrada, con mayor altura de linea y ocupando tres columnas. -->
+            <td colspan="3" line-height="150%" align="center">${item.quantity}</td>
+            <#-- Imprime en negritas el nombre del articulo y, en la linea siguiente, su descripcion. -->
+            <td colspan="12"><span class="itemname">${item.item}</span><br />${item.description}</td>
+            <#-- Imprime las opciones o configuraciones del articulo. -->
+            <td colspan="3">${item.options}</td>
+            <#-- Imprime la tarifa unitaria alineada a la derecha. -->
+            <td colspan="4" align="right">${item.rate}</td>
+            <#-- Imprime el importe de la linea alineado a la derecha. -->
+            <td colspan="4" align="right">${item.amount}</td>
+        <#-- Cierra la fila del articulo actual. -->
+        </tr>
+    <#-- Finaliza el recorrido de la sublista de articulos. -->
+    </#list>
+    <#-- Marca el final de la seccion de articulos. -->
+    <!-- end items -->
+<#-- Cierra la tabla de articulos. -->
+</table>
+<#-- Dibuja una linea horizontal debajo de los articulos. -->
+<hr />
+<#-- Cierra la condicion que evita mostrar esta seccion cuando no hay articulos. -->
+</#if>
+<#-- Crea la tabla del resumen monetario y evita su separacion entre paginas mediante la clase total. -->
+<table class="total" style="width: 100%; margin-top: 10px;">
+    <#-- Abre la fila del subtotal. -->
+    <tr>
+        <#-- Deja vacias cuatro columnas para empujar las cantidades hacia la derecha. -->
+        <td colspan="4"></td>
+        <#-- Muestra en negritas y a la derecha la etiqueta localizada del subtotal. -->
+        <td align="right"><b>${record.subtotal@label}</b></td>
+        <#-- Muestra a la derecha el valor del subtotal. -->
+        <td align="right">${record.subtotal}</td>
+    <#-- Cierra la fila del subtotal. -->
+    </tr>
+    <#-- Abre la fila de impuestos. -->
+    <tr>
+        <#-- Deja vacias cuatro columnas para mantener la alineacion con la fila anterior. -->
+        <td colspan="4"></td>
+        <#-- Muestra la etiqueta del impuesto y su tasa porcentual entre parentesis. -->
+        <td align="right"><b>${record.taxtotal@label} (${record.taxrate}%)</b></td>
+        <#-- Muestra a la derecha el importe total de impuestos. -->
+        <td align="right">${record.taxtotal}</td>
+    <#-- Cierra la fila de impuestos. -->
+    </tr>
+    <#-- Abre la fila destacada del total final. -->
+    <tr class="totalrow">
+        <#-- Deja cuatro columnas vacias con fondo blanco para conservar el bloque de total a la derecha. -->
+        <td background-color="#ffffff" colspan="4"></td>
+        <#-- Muestra en negritas y a la derecha la etiqueta localizada del total. -->
+        <td align="right"><b>${record.total@label}</b></td>
+        <#-- Muestra a la derecha el importe total de la transaccion. -->
+        <td align="right">${record.total}</td>
+    <#-- Cierra la fila del total final. -->
+    </tr>
+<#-- Cierra la tabla del resumen monetario. -->
+</table>
+<#-- Cierra el contenido visible del documento. -->
+</body>
+<#-- Cierra el documento PDF. -->
+</pdf>
