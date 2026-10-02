@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pdf PUBLIC "-//big.faceless.org//report" "report-1.1.dtd">
+<pdf>
+<head>
+    <link name="NotoSans" type="font" subtype="truetype" src="${nsfont.NotoSans_Regular}" src-bold="${nsfont.NotoSans_Bold}" bytes="2" />
+    <macrolist>
+        <macro id="lateHeader">
+            <table style="width:100%; background-color:#0968a8; color:#ffffff; height:62pt;">
+                <tr>
+                    <td style="width:58%; padding:12pt 16pt; vertical-align:middle;">
+                        <#if late.company.logoUrl?has_content>
+                            <@filecabinet nstype="image" src="${late.company.logoUrl?xml}" style="width:145pt; height:37pt;" />
+                        <#else>
+                            <span style="font-size:21pt; font-weight:bold;">${late.company.name?xml}</span>
+                        </#if>
+                    </td>
+                    <td align="right" style="width:42%; padding:14pt; vertical-align:middle; font-size:9pt;">${late.company.tagline?xml}</td>
+                </tr>
+            </table>
+        </macro>
+        <macro id="lateFooter">
+            <p align="center" style="font-size:7pt; color:#0079c8; margin:0 0 5pt;">
+                ${late.company.name?xml}<#if late.company.taxId?has_content> · ID fiscal: ${late.company.taxId?xml}</#if>
+            </p>
+            <p align="center" style="font-size:7pt; color:#0079c8; margin:0 0 5pt;">
+                <#list late.company.addressLines as addressLine>${addressLine?xml}<#sep> · </#list>
+            </p>
+            <table style="width:100%; font-size:7pt; color:#0079c8;">
+                <tr>
+                    <td style="width:35%;">${late.company.website?xml}</td>
+                    <td align="center" style="width:40%;">${late.company.email?xml}</td>
+                    <td align="right" style="width:25%;"><#if late.company.phone?has_content>Tel. ${late.company.phone?xml}</#if></td>
+                </tr>
+                <tr><td colspan="3" align="right" style="font-size:5.5pt;">LATE 1 · <pagenumber/> / <totalpages/></td></tr>
+            </table>
+        </macro>
+    </macrolist>
+    <style type="text/css">
+        * { font-family:NotoSans, sans-serif; }
+        body { font-size:9pt; }
+        table { table-layout:fixed; }
+        td { padding:2pt 4pt; vertical-align:top; }
+        p { margin:0 0 10pt; line-height:13pt; }
+        .meta { width:100%; margin-top:16pt; }
+        .title { font-size:14pt; font-weight:bold; margin:10pt 0 14pt; }
+        .items { width:100%; margin-top:10pt; font-size:8pt; }
+        .items th { border-top:0.6pt solid #000000; border-bottom:0.6pt solid #000000; padding:4pt 3pt; font-weight:normal; }
+        .items td { padding:7pt 3pt; }
+        .totals td { padding:4pt; }
+    </style>
+</head>
+<body size="A4" padding="22pt 22pt 24pt 22pt" header="lateHeader" header-height="72pt" footer="lateFooter" footer-height="65pt">
+    <table class="meta">
+        <tr>
+            <td style="width:54%;">
+                <table style="width:100%;">
+                    <tr><td style="width:35%;">Fecha:</td><td style="width:65%;">${late.noticeDate?xml}</td></tr>
+                    <tr><td>Nº factura:</td><td>${record.tranid?xml}</td></tr>
+                    <tr><td>Vencimiento:</td><td>${late.dueDate?xml}</td></tr>
+                </table>
+            </td>
+            <td style="width:46%; height:120pt;">
+                <#if late.addressLines?size gt 0>
+                    <#list late.addressLines as addressLine>${addressLine?xml}<br /></#list>
+                <#else>${late.customerName?xml}</#if>
+                <#if late.customerTaxId?has_content><br /><br />ID fiscal: ${late.customerTaxId?xml}</#if>
+            </td>
+        </tr>
+    </table>
+    <table style="width:100%;">
+        <tr><td style="width:19%;">Centro:</td><td style="width:81%;">${late.center?xml}</td></tr>
+        <#if late.contract?has_content><tr><td>Nº contrato:</td><td>${late.contract?xml}</td></tr></#if>
+        <#if late.paymentMethod?has_content><tr><td>Forma de pago:</td><td>${late.paymentMethod?xml}</td></tr></#if>
+        <#if late.terms?has_content><tr><td>Condiciones:</td><td>${late.terms?xml}</td></tr></#if>
+    </table>
+    <p class="title" align="center">AVISO DE PAGO Nº 1</p>
+    <p>Estimado cliente,</p>
+    <#if late.hasBalance>
+    <p>Le comunicamos que la factura <b>${record.tranid?xml}</b>
+        <#if late.overdue>se encuentra vencida y </#if>registra un saldo pendiente de
+        <b>${record.amountremaining?xml}<#if late.currency?has_content> ${late.currency?xml}</#if></b>.
+        Le rogamos regularizar su pago y utilizar el número de factura como referencia.</p>
+    <#else><p>La factura <b>${record.tranid?xml}</b> no registra saldo pendiente de pago.</p></#if>
+    <p>Recargo de referencia por atraso y costes administrativos: ${late.lateFeePercent?xml}% del importe pendiente, con un mínimo de ${late.minimumLateFee?xml} EUR antes de impuestos.<br />
+        Recargo estimado: <#if late.feeBase?has_content><b>${late.feeBase?xml} EUR</b><#else>no disponible</#if>.
+        Impuesto del recargo: <#if late.feeTax?has_content>${late.feeTax?xml} EUR<#else>no disponible</#if>.<br />
+        Este cálculo es informativo y no está incluido en el total de la factura.</p>
+    <#if late.additionalNotice?has_content><p>${late.additionalNotice?xml}</p></#if>
+    <p>Para realizar su pago por transferencia o depósito, utilice los datos bancarios confirmados por nuestro equipo, indicando su nombre completo y número de factura:</p>
+    <p align="center" style="margin:6pt 0 18pt;"><b>Banco: ${late.bankName?xml}<br />Cuenta: ${late.bankAccount?xml}<br />Titular: ${late.bankHolder?xml}</b></p>
+    <p style="margin-top:18pt;">A continuación le adjuntamos el detalle de esta factura y su saldo pendiente.
+        Para consultar la situación de su cuenta, póngase en contacto con nosotros<#if late.company.phone?has_content> al <b>${late.company.phone?xml}</b></#if><#if late.company.email?has_content> o escriba a <b>${late.company.email?xml}</b></#if>.</p>
+    <p>En caso de haber realizado su pago en los últimos días, le rogamos ignore esta notificación.</p>
+    <table style="width:100%; margin-top:28pt;">
+        <tr><td style="width:65%;"></td><td align="center" style="width:35%;">Atentamente,<br /><br />${late.company.name?xml}</td></tr>
+    </table>
+    <pbr />
+    <table class="meta">
+        <tr>
+            <td style="width:54%;">
+                <table style="width:100%;">
+                    <tr><td style="width:35%;">Fecha:</td><td style="width:65%;">${record.trandate?xml}</td></tr>
+                    <tr><td>Nº factura:</td><td>${record.tranid?xml}</td></tr>
+                    <tr><td>Vencimiento:</td><td>${late.dueDate?xml}</td></tr>
+                </table>
+            </td>
+            <td style="width:46%; height:118pt;">
+                <#if late.addressLines?size gt 0>
+                    <#list late.addressLines as addressLine>${addressLine?xml}<br /></#list>
+                <#else>${late.customerName?xml}</#if>
+                <#if late.customerTaxId?has_content><br /><br />ID fiscal: ${late.customerTaxId?xml}</#if>
+            </td>
+        </tr>
+    </table>
+    <table style="width:100%;">
+        <tr><td style="width:19%;">Centro:</td><td style="width:81%;">${late.center?xml}</td></tr>
+        <#if late.paymentMethod?has_content><tr><td>Forma de pago:</td><td>${late.paymentMethod?xml}</td></tr></#if>
+        <#if late.currency?has_content><tr><td>Moneda:</td><td>${late.currency?xml}</td></tr></#if>
+    </table>
+    <p class="title" align="center">Factura</p>
+    <table class="items">
+        <thead><tr>
+            <th style="width:15%;">Vencimiento</th><th style="width:11%;">Nº cuarto</th>
+            <th style="width:34%;">Descripción de servicios</th><th align="right" style="width:10%;">Cantidad</th>
+            <th align="right" style="width:15%;">Precio unitario</th><th align="right" style="width:15%;">Total</th>
+        </tr></thead>
+        <#list record.item as item>
+            <tr>
+                <td>${late.dueDate?xml}</td><td>${(late.rooms[item_index].value!'')?xml}</td>
+                <td><#if item.description?has_content>${item.description?xml}<#else>${(item.item!'')?xml}</#if></td>
+                <td align="right">${(item.quantity!'')?xml}</td><td align="right">${(item.rate!'')?xml}</td><td align="right">${(item.amount!'')?xml}</td>
+            </tr>
+        </#list>
+    </table>
+    <table class="totals" style="width:100%; margin-top:90pt; page-break-inside:avoid;">
+        <tr><td style="width:55%;"></td><td style="width:28%;">Base imponible:</td><td align="right" style="width:17%;">${record.subtotal?xml}</td></tr>
+        <#if record.discounttotal?has_content><tr><td></td><td>Descuento:</td><td align="right">${record.discounttotal?xml}</td></tr></#if>
+        <#if record.shippingcost?has_content><tr><td></td><td>Envío:</td><td align="right">${record.shippingcost?xml}</td></tr></#if>
+        <#if record.handlingcost?has_content><tr><td></td><td>Manejo:</td><td align="right">${record.handlingcost?xml}</td></tr></#if>
+        <tr><td></td><td>Impuestos:</td><td align="right">${record.taxtotal?xml}</td></tr>
+        <#if record.tax2total?has_content><tr><td></td><td>Otros impuestos:</td><td align="right">${record.tax2total?xml}</td></tr></#if>
+        <tr><td></td><td><b>Total factura:</b></td><td align="right"><b>${record.total?xml}</b></td></tr>
+        <tr><td></td><td><b>Saldo pendiente:</b></td><td align="right"><b>${record.amountremaining?xml}</b></td></tr>
+    </table>
+    <p style="margin:18pt 0 0 18pt;">Gracias por su confianza.</p>
+</body>
+</pdf>
