@@ -4,6 +4,13 @@ Esta carpeta reúne las prácticas de NetSuite organizadas por tipo de script. L
 
 ## Índice por tipo de script
 
+### Late 1: aviso de pago desde Invoice
+
+- [Instalación manual, campos e IDs de scripts](./templates/practice/late-1/INSTALACION.md)
+- Botón **Late 1**: busca la última Invoice creada con el formulario de la factura abierta y genera aviso + detalle en PDF.
+- Empresa/subsidiaria leída de NetSuite; Café de Finca como nombre de respaldo. Datos bancarios ausentes vacíos y recargo de referencia calculado en EUR, sin contabilizarlo.
+- Estado: código y pruebas locales preparados; pendiente la carga manual y comprobación del PDF en NetSuite.
+
 ### Client Scripts
 
 - [Documentación: validación de categoría de cliente](./client-scripts/documentation.md)
